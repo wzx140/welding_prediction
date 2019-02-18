@@ -1,10 +1,12 @@
 import h5py
 import numpy as np
+import random
 
 
-def load_data():
+def load_data(incomplete: bool):
     """
     load welding test and train data
+    :param: incomplete mood
     :return: plain data which need to DTW, and number of good and bad
     """
     data = []
@@ -18,6 +20,10 @@ def load_data():
             data.append(f['GOOD/DATA'][count:count + length])
             num_good += 1
             count += length
+
+        if incomplete:
+            data = random.sample(data, 50)
+            num_good = 50
 
         # load bad data
         lengths = f['BAD/LEN'][:]
