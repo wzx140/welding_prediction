@@ -19,6 +19,9 @@ Implemented Dropout and L2-regularization
 #### FAST MOOD
 Since it takes a lot of time to complete DTW, you can set *fast_mode* True in *config.py*. It loads the data after DTW
 
+#### INCOMPLETE MOOD
+Load data of 50 good and 50 bad. Over-fitting is more serious.
+
 #### PERSISTENCE
 The log is in *log.txt* when program execution completed
  

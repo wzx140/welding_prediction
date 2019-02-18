@@ -12,16 +12,24 @@ from dnn import Dnn
 
 if __name__ == '__main__':
 
-    log.log_debug('Data loading begin')
-    data, num_good, num_bad = util.load_data()
+    if incomplete_mode:
+        log.log_debug('Data loading begin: incomplete mode')
+        data, num_good, num_bad = util.load_data(True)
+    else:
+        log.log_debug('Data loading begin')
+        data, num_good, num_bad = util.load_data(False)
     log.log_info('Data loading completed')
 
-    if fast_mode:
+    if fast_mode and not incomplete_mode:
         with h5py.File('dataSets/data.h5') as f:
             data_processed = f['processed_data'][:]
         log.log_info('Fast mood: Data processing completed')
+    elif fast_mode and incomplete_mode:
+        with h5py.File('dataSets/data.h5') as f:
+            data_processed = f['processed_data_in'][:]
+        log.log_info('Fast mood: Data processing completed')
     else:
-        # data 2-2050 dtw with data 1
+        # data dtw with data 1
         p_list = []
         q_list = []
         log.log_debug('DTW begin')
@@ -45,7 +53,7 @@ if __name__ == '__main__':
         data_processed = util.flatten(data)
         log.log_info('Other processing completed')
 
-    train_x, train_y, test_x, test_y = util.shuffle_data(data_processed, num_good, num_bad, 0.1)
+    train_x, train_y, test_x, test_y = util.shuffle_data(data_processed, num_good, num_bad, 0.3)
 
     # log the cost and accuracy
     cost_log = []
@@ -53,7 +61,8 @@ if __name__ == '__main__':
     train_log = []
     x = []
 
-    dnn = Dnn(layer_dims, mini_batch_size=test_x.shape[1], learning_rate=learning_rate, lambd=lambd,
+    layer_dims.insert(0, train_x.shape[0])
+    dnn = Dnn(layer_dims, mini_batch_size=train_x.shape[1], learning_rate=learning_rate, lambd=lambd,
               keep_prob=keep_prob)
     dnn.initialize_parameters()
     dnn.forward()
@@ -91,6 +100,7 @@ if __name__ == '__main__':
     plt.subplot(122)
     plt.xlabel('Iteration')
     plt.ylabel('Accuracy')
+    plt.ylim(0, 1)
     plt.plot(x, train_log, label='train accuracy')
     plt.plot(x, test_log, label='test accuracy')
     plt.legend()
