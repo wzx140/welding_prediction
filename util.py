@@ -2,12 +2,14 @@ import h5py
 import numpy as np
 import random
 
+# from matplotlib import pyplot as plt
+
 
 def load_data(incomplete: bool):
     """
     load welding test and train data
     :param: incomplete mood
-    :return: plain data which need to DTW, and number of good and bad
+    :return: plain data, and number of good and bad
     """
     data = []
     num_good = 0
@@ -75,17 +77,32 @@ def regularize(matrix: np.ndarray, axis: int = 0):
     return (matrix - mean) / std
 
 
-def flatten(matrices: list):
+def resample(data: np.ndarray, length: int = 0):
     """
-    flatten each matrix in matrices and stitch by column
 
-    :param matrices:
+    :param data:
+    :param length:
     :return:
     """
-    shape = matrices[0].shape
-    for matrix in matrices:
-        assert matrix.shape == shape
-    output = np.zeros((shape[0] * shape[1], len(matrices)))
-    for i, matrix in enumerate(matrices):
-        output[..., i] = matrix.flatten(order='F')
-    return output
+    result = []
+    if length == 0:
+        length = min([len(d) for d in data])
+
+    for item in data:
+        index = np.linspace(0, len(item), length, endpoint=False, dtype=np.int)
+        result.append(item[index, :])
+
+    return result
+
+
+# if __name__ == '__main__':
+#     data, num1, num2 = load_data(False)
+#     data2 = resample(data, 600)
+#     plt.figure()
+#     plt.subplot(121)
+#     plt.plot(data[0][:, 0])
+#
+#     plt.subplot(122)
+#     plt.plot(data2[0][:, 0])
+#
+#     plt.show()

@@ -8,12 +8,6 @@ num_iterations = 500
 # display and record some detail
 print_detail = True
 
-# fast mode: read preprocessed data directly
-fast_mode = True
-
-# incomplete mode: randomly select train data in order to ensure the sizes of train data and test data are equal
-incomplete_mode = True
-
 enable_debug = False
 
 # regularization

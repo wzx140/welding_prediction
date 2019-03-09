@@ -8,7 +8,7 @@ import dtw
 import log
 import util
 from config import *
-from dnn import Dnn
+from cnn import Cnn
 
 if __name__ == '__main__':
 
@@ -62,7 +62,7 @@ if __name__ == '__main__':
     x = []
 
     layer_dims.insert(0, train_x.shape[0])
-    dnn = Dnn(layer_dims, mini_batch_size=train_x.shape[1], learning_rate=learning_rate, lambd=lambd,
+    dnn = Cnn(layer_dims, mini_batch_size=train_x.shape[1], learning_rate=learning_rate, lambd=lambd,
               keep_prob=keep_prob)
     dnn.initialize_parameters()
     dnn.forward()

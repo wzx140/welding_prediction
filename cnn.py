@@ -9,7 +9,7 @@ class REGULARIZATION(Enum):
     DROPOUT = 2
 
 
-class Dnn(object):
+class Cnn(object):
     """
     deep neural network. This class just build the calculation graph. You still need to run with tf session
     """
