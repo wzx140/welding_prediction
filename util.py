@@ -1,14 +1,14 @@
 import h5py
 import numpy as np
-import random
+
 
 # from matplotlib import pyplot as plt
 
 
-def load_data(incomplete: bool):
+def load_data(load_num_good: int = 2000):
     """
     load welding test and train data
-    :param: incomplete mood
+    :param: load_num_good: 0->all
     :return: plain data, and number of good and bad
     """
     data = []
@@ -18,14 +18,12 @@ def load_data(incomplete: bool):
         # load good data
         lengths = f['GOOD/LEN'][:]
         count = 0
-        for length in lengths:
+        for num, length in enumerate(lengths):
             data.append(f['GOOD/DATA'][count:count + length])
             num_good += 1
             count += length
-
-        if incomplete:
-            data = random.sample(data, 50)
-            num_good = 50
+            if num == load_num_good - 1:
+                break
 
         # load bad data
         lengths = f['BAD/LEN'][:]
@@ -36,31 +34,6 @@ def load_data(incomplete: bool):
             count += length
 
     return data, num_good, num_bad
-
-
-def shuffle_data(data, num_good: int, num_bad: int, radio: float = 0.3):
-    """
-    randomly disrupt data
-    :param radio: radio of test
-    :param num_bad: number of good example in data
-    :param num_good: number of bad example in data
-    :param data: good + bad data after pretreatment
-    :return: train_x, train_y, test_x, test_y
-    """
-    num = num_good + num_bad
-    num_test = int(num * radio)
-    num_train = num - num_test
-    data_y = np.array([1] * num_good + [0] * num_bad, dtype=np.float32).reshape((1, num))
-
-    permutation = list(np.random.permutation(num))
-    shuffled_x = data[:, permutation]
-    shuffled_y = data_y[:, permutation]
-    train_x = shuffled_x[:, 0:num_train]
-    train_y = shuffled_y[:, 0:num_train]
-    test_x = shuffled_x[:, num_train:num]
-    test_y = shuffled_y[:, num_train:num]
-    return train_x, train_y, test_x, test_y
-
 
 def regularize(matrix: np.ndarray, axis: int = 0):
     """
@@ -77,12 +50,12 @@ def regularize(matrix: np.ndarray, axis: int = 0):
     return (matrix - mean) / std
 
 
-def resample(data: np.ndarray, length: int = 0):
+def resample(data: list, length: int = 0):
     """
-
+    Downsample, the default length after sampling is the minimum length
     :param data:
-    :param length:
-    :return:
+    :param length: 0->default
+    :return: result and length
     """
     result = []
     if length == 0:
@@ -92,6 +65,21 @@ def resample(data: np.ndarray, length: int = 0):
         index = np.linspace(0, len(item), length, endpoint=False, dtype=np.int)
         result.append(item[index, :])
 
+    return result, length
+
+
+def reshape(data: list, length: int):
+    """
+    reshape to (m, nx, 1, 3)
+    :param data:
+    :param length: the length of the time series
+    :return:
+    """
+    result = np.zeros((len(data), 1, length, 3), dtype=np.float)
+    for i, item in enumerate(data):
+        result[i, :, :, 0] = item[:, 0]
+        result[i, :, :, 1] = item[:, 1]
+        result[i, :, :, 2] = item[:, 2]
     return result
 
 
