@@ -1,6 +1,8 @@
+import math
+import random
+
 import h5py
 import numpy as np
-
 
 # from matplotlib import pyplot as plt
 
@@ -22,8 +24,9 @@ def load_data(load_num_good: int = 2000):
             data.append(f['GOOD/DATA'][count:count + length])
             num_good += 1
             count += length
-            if num == load_num_good - 1:
-                break
+
+        data = random.sample(data, load_num_good)
+        num_good = load_num_good
 
         # load bad data
         lengths = f['BAD/LEN'][:]
@@ -34,6 +37,7 @@ def load_data(load_num_good: int = 2000):
             count += length
 
     return data, num_good, num_bad
+
 
 def regularize(matrix: np.ndarray, axis: int = 0):
     """
@@ -48,6 +52,66 @@ def regularize(matrix: np.ndarray, axis: int = 0):
     mean = np.mean(matrix, axis=axis, keepdims=True)
     std = np.std(matrix, axis=axis, keepdims=True)
     return (matrix - mean) / std
+
+
+def shuffle_data(data, num_good: int, num_bad: int, radio: float = 0.3):
+    """
+    randomly disrupt data
+    :param radio: radio of test
+    :param num_bad: number of good example in data
+    :param num_good: number of bad example in data
+    :param data: good + bad data after pretreatment
+    :return: train_x, train_y, test_x, test_y
+    """
+    num = num_good + num_bad
+    num_test = int(num * radio)
+    num_train = num - num_test
+    data_y = np.array([1.] * num_good + [0.] * num_bad, dtype=np.float).reshape((num, 1))
+
+    permutation = list(np.random.permutation(num))
+    shuffled_x = data[permutation, :]
+    shuffled_y = data_y[permutation, :]
+    train_x = shuffled_x[0:num_train, :]
+    train_y = shuffled_y[0:num_train, :]
+    test_x = shuffled_x[num_train:num, :]
+    test_y = shuffled_y[num_train:num, :]
+    return train_x, train_y, test_x, test_y
+
+
+def random_mini_batches(x, y, mini_batch_size=64):
+    """
+    Creates a list of random minibatches from (x, y)
+
+    Arguments:
+    :param x: input data, of shape (input size, number of examples) (m, Hi, Wi, Ci)
+    :param y: true "label" vector (containing 0 if cat, 1 if non-cat), of shape (1, number of examples) (m, n_y)
+    :param mini_batch_size: size of the mini-batches, integer
+
+    :return: list of synchronous (mini_batch_x, mini_batch_y)
+    """
+
+    m = x.shape[0]
+    mini_batches = []
+
+    permutation = list(np.random.permutation(m))
+    shuffled_x = x[permutation, :]
+    shuffled_y = y[permutation, :]
+
+    num_complete_minibatches = math.floor(m / mini_batch_size)
+    for k in range(0, num_complete_minibatches):
+        mini_batch_x = shuffled_x[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :]
+        mini_batch_y = shuffled_y[k * mini_batch_size: k * mini_batch_size + mini_batch_size, :]
+        mini_batch = (mini_batch_x, mini_batch_y)
+        mini_batches.append(mini_batch)
+
+    # Handling the end case (last mini-batch < mini_batch_size)
+    if m % mini_batch_size != 0:
+        mini_batch_x = shuffled_x[num_complete_minibatches * mini_batch_size: m, :]
+        mini_batch_y = shuffled_y[num_complete_minibatches * mini_batch_size: m, :]
+        mini_batch = (mini_batch_x, mini_batch_y)
+        mini_batches.append(mini_batch)
+
+    return mini_batches
 
 
 def resample(data: list, length: int = 0):
@@ -75,17 +139,15 @@ def reshape(data: list, length: int):
     :param length: the length of the time series
     :return:
     """
-    result = np.zeros((len(data), 1, length, 3), dtype=np.float)
+    result = np.zeros((len(data), length, 3), dtype=np.float)
     for i, item in enumerate(data):
-        result[i, :, :, 0] = item[:, 0]
-        result[i, :, :, 1] = item[:, 1]
-        result[i, :, :, 2] = item[:, 2]
+        result[i, :, :] = item
     return result
 
 
 # if __name__ == '__main__':
 #     data, num1, num2 = load_data(False)
-#     data2 = resample(data, 600)
+#     data2, length = resample(data, 512)
 #     plt.figure()
 #     plt.subplot(121)
 #     plt.plot(data[0][:, 0])
