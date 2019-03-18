@@ -5,7 +5,7 @@ logger = logging.getLogger('tensorflow')
 logger.setLevel(logging.DEBUG)
 
 # 创建一个handler，用于写入日志文件
-fh = logging.FileHandler('log.txt', mode='w', encoding='utf-8')
+fh = logging.FileHandler('log.txt', encoding='utf-8')
 fh.setLevel(logging.INFO)
 
 # 定义handler的输出格式

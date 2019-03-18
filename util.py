@@ -147,7 +147,7 @@ def reshape(data: list, length: int):
 
 # if __name__ == '__main__':
 #     data, num1, num2 = load_data(False)
-#     data2, length = resample(data, 512)
+#     data2, length = resample(data, 600)
 #     plt.figure()
 #     plt.subplot(121)
 #     plt.plot(data[0][:, 0])
