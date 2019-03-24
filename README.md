@@ -32,3 +32,4 @@ If you want to use **tfdbg**, you should,
 ### MORE
 - use `git LFS` to download the data
 - model's accuracy is about 0.95
+- see the [demo](./demo.ipynb)
