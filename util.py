@@ -4,8 +4,6 @@ import random
 import h5py
 import numpy as np
 
-# from matplotlib import pyplot as plt
-
 
 def load_data(load_num_good: int = 2000):
     """
@@ -54,28 +52,18 @@ def regularize(matrix: np.ndarray, axis: int = 0):
     return (matrix - mean) / std
 
 
-def shuffle_data(data, num_good: int, num_bad: int, radio: float = 0.3):
+def shuffle_data(data, label):
     """
     randomly disrupt data
-    :param radio: radio of test
-    :param num_bad: number of good example in data
-    :param num_good: number of bad example in data
-    :param data: good + bad data after pretreatment
-    :return: train_x, train_y, test_x, test_y
+    :param data:
+    :param label:
+    :return:
     """
-    num = num_good + num_bad
-    num_test = int(num * radio)
-    num_train = num - num_test
-    data_y = np.array([1.] * num_good + [0.] * num_bad, dtype=np.float).reshape((num, 1))
 
-    permutation = list(np.random.permutation(num))
+    permutation = list(np.random.permutation(len(data)))
     shuffled_x = data[permutation, :]
-    shuffled_y = data_y[permutation, :]
-    train_x = shuffled_x[0:num_train, :]
-    train_y = shuffled_y[0:num_train, :]
-    test_x = shuffled_x[num_train:num, :]
-    test_y = shuffled_y[num_train:num, :]
-    return train_x, train_y, test_x, test_y
+    shuffled_y = label[permutation, :]
+    return shuffled_x, shuffled_y
 
 
 def random_mini_batches(x, y, mini_batch_size=64):
@@ -145,14 +133,37 @@ def reshape(data: list, length: int):
     return result
 
 
-# if __name__ == '__main__':
-#     data, num1, num2 = load_data(False)
-#     data2, length = resample(data, 600)
-#     plt.figure()
-#     plt.subplot(121)
-#     plt.plot(data[0][:, 0])
-#
-#     plt.subplot(122)
-#     plt.plot(data2[0][:, 0])
-#
-#     plt.show()
+def add_noise(data: np.ndarray, num: int, scale: float):
+    """
+    expand the data with noise
+    :param data:
+    :param num: the number of adding noise sample
+    :param scale: the range of the noise
+    :return:
+    """
+    size, width, depth = data.shape
+    result = np.zeros(shape=(num, width, depth), dtype=np.float)
+    index = 0
+    for i in range(num):
+        noise = (np.random.rand(width, depth) - 0.5) * scale
+        result[i] = data[index] + noise
+        index = index + 1 if index != size - 1 else 0
+    return result
+
+
+def transition(data: np.ndarray, num: int, scale: float):
+    """
+    move data up and down
+    :param data:
+    :param num: the number of sample after moving
+    :param scale: the range of the moving
+    :return:
+    """
+    size, width, depth = data.shape
+    result = np.zeros(shape=(num, width, depth), dtype=np.float)
+    index = 0
+    for i in range(num):
+        distance = (random.random() - 0.5) * scale
+        result[i] = data[index] + distance
+        index = index + 1 if index != size - 1 else 0
+    return result

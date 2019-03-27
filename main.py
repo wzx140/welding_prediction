@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 # for debug
 from tensorflow.python import debug as tf_debug
+import numpy as np
 
 import log
 import util
@@ -10,23 +11,72 @@ from cnn import Cnn
 
 if __name__ == '__main__':
     log.log_info('program start')
-    data, num_good, num_bad = util.load_data(50)
+    data, num_good, num_bad = util.load_data(num_data // 2)
     log.log_debug('Data loading completed')
 
-    # resample and regularize
+    # resample
     data, length = util.resample(data, 600)
     data = util.reshape(data, length)
-    for i in range(len(data)):
-        data[i, :, 0] = util.regularize(data[i, :, 0])
-        data[i, :, 1] = util.regularize(data[i, :, 1])
-        data[i, :, 2] = util.regularize(data[i, :, 2])
-    train_x, train_y, test_x, test_y = util.shuffle_data(data, num_good, num_bad, 0.3)
+    good_data_origin = data[:num_good, :]
+    bad_data_origin = data[num_good:, :]
+
+    # extract bad data for test and train
+    permutation = list(np.random.permutation(len(bad_data_origin)))
+    shuffled_bad_data = bad_data_origin[permutation, :]
+    test_bad_data = shuffled_bad_data[:int(num_bad * 0.3), :]
+    train_bad_data_origin = shuffled_bad_data[int(num_bad * 0.3):, :]
+    # extract corresponding good data for test and train
+    permutation = list(np.random.permutation(len(good_data_origin)))
+    shuffled_good_data = good_data_origin[permutation, :]
+    test_good_data = shuffled_good_data[:len(test_bad_data), :]
+    train_good_data = shuffled_good_data[len(test_bad_data):, :]
+
+    assert len(test_bad_data) == len(test_good_data)
+    # construct test data
+    test_y = np.array([1.] * len(test_good_data) + [0.] * len(test_bad_data), dtype=np.float).reshape(
+        (len(test_bad_data) + len(test_good_data), 1))
+    test_x = np.vstack((test_good_data, test_bad_data))
+
+    # expand the number of bad data for train
+    add_noise = int((len(train_good_data) - len(train_bad_data_origin)) * add_noise_radio)
+    transition = len(train_good_data) - add_noise - len(train_bad_data_origin)
+    if add_noise and transition:
+        result1 = util.add_noise(train_bad_data_origin, add_noise, 1)
+        result2 = util.transition(train_bad_data_origin, transition, 2)
+        train_bad_data = np.vstack((result1, result2, train_bad_data_origin))
+    else:
+        train_bad_data = train_bad_data_origin
+
+    assert len(train_bad_data) == len(train_good_data)
+    # construct train data
+    train_y = np.array([1.] * len(train_good_data) + [0.] * len(train_bad_data), dtype=np.float).reshape(
+        (len(train_bad_data) + len(train_good_data), 1))
+    train_x = np.vstack((train_good_data, train_bad_data))
+
+    # regularize
+    for i in range(len(train_x)):
+        train_x[i, :, 0] = util.regularize(train_x[i, :, 0])
+        train_x[i, :, 1] = util.regularize(train_x[i, :, 1])
+        train_x[i, :, 2] = util.regularize(train_x[i, :, 2])
+    for i in range(len(test_x)):
+        test_x[i, :, 0] = util.regularize(test_x[i, :, 0])
+        test_x[i, :, 1] = util.regularize(test_x[i, :, 1])
+        test_x[i, :, 2] = util.regularize(test_x[i, :, 2])
+
+    # random
+    train_x, train_y = util.shuffle_data(train_x, train_y)
+
     log.log_debug('prepare completed')
     log.log_info('convolution layers: ' + str(conv_layers))
     log.log_info('filters: ' + str(filters))
     log.log_info('full connected layers: ' + str(learning_rate))
     log.log_info('learning rate: ' + str(fc_layers))
     log.log_info('keep prob: ' + str(keep_prob))
+    log.log_info('the number of expanding bad data: ' + str(add_noise + transition))
+    log.log_info('mini batch size: ' + str(mini_batch_size))
+
+    if mini_batch_size != 0:
+        assert mini_batch_size <= len(train_x)
 
     cnn = Cnn(conv_layers, fc_layers, filters, learning_rate)
     (m, n_W0, n_C0) = train_x.shape
