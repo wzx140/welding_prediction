@@ -1,6 +1,6 @@
 import math
 import random
-
+import definitions
 import h5py
 import numpy as np
 
@@ -14,7 +14,7 @@ def load_data(load_num_good: int = 2000):
     data = []
     num_good = 0
     num_bad = 0
-    with h5py.File('dataSets/data.h5') as f:
+    with h5py.File(definitions.ROOT_DIR + 'dataSets/data.h5') as f:
         # load good data
         lengths = f['GOOD/LEN'][:]
         count = 0

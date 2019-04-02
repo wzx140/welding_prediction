@@ -4,7 +4,7 @@ import tensorflow as tf
 from tensorflow.python import debug as tf_debug
 import numpy as np
 
-import log
+from log import log
 import util
 from config import *
 from cnn import Cnn
