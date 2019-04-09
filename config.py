@@ -11,7 +11,7 @@ fc_layers = []
 
 learning_rate = 0.00005
 
-num_epochs = 100
+num_epochs = 200
 
 # 0->disable
 mini_batch_size = 64
@@ -24,7 +24,5 @@ enable_debug = False
 # regularization
 keep_prob = 0.3
 
-# expand train data
-add_noise_radio = 0.5
 # the number of data for train and test
 num_data = 1000

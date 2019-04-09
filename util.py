@@ -3,6 +3,7 @@ import random
 import definitions
 import h5py
 import numpy as np
+from imblearn.over_sampling import ADASYN
 
 
 def load_data(load_num_good: int = 2000):
@@ -133,37 +134,13 @@ def reshape(data: list, length: int):
     return result
 
 
-def add_noise(data: np.ndarray, num: int, scale: float):
+def expand(x: np.ndarray, y: np.ndarray):
     """
-    expand the data with noise
-    :param data:
-    :param num: the number of adding noise sample
-    :param scale: the range of the noise
+    enlarge the number of the minority class use ADASYN
+    :param x:
+    :param y:
     :return:
     """
-    size, width, depth = data.shape
-    result = np.zeros(shape=(num, width, depth), dtype=np.float)
-    index = 0
-    for i in range(num):
-        noise = (np.random.rand(width, depth) - 0.5) * scale
-        result[i] = data[index] + noise
-        index = index + 1 if index != size - 1 else 0
-    return result
-
-
-def transition(data: np.ndarray, num: int, scale: float):
-    """
-    move data up and down
-    :param data:
-    :param num: the number of sample after moving
-    :param scale: the range of the moving
-    :return:
-    """
-    size, width, depth = data.shape
-    result = np.zeros(shape=(num, width, depth), dtype=np.float)
-    index = 0
-    for i in range(num):
-        distance = (random.random() - 0.5) * scale
-        result[i] = data[index] + distance
-        index = index + 1 if index != size - 1 else 0
-    return result
+    ada = ADASYN()
+    x_res, y_res = ada.fit_resample(x.reshape(-1, 600 * 3), y.reshape(-1))
+    return x_res.reshape(-1, 600, 3), y_res.reshape(-1, 1), len(x_res.reshape(-1, 600, 3)) - len(x)

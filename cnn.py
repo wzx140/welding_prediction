@@ -91,4 +91,13 @@ class Cnn(object):
     def predict(self):
         pre = tf.cast(tf.greater(self.__a, 0.5), dtype=np.float, name='output')
         accuracy = tf.reduce_mean(tf.cast(tf.equal(pre, self.__y), "float"))
-        return pre, accuracy
+
+        # calculate f1_score
+        TP = tf.count_nonzero(pre * self.__y)
+        TN = tf.count_nonzero((pre - 1) * (self.__y - 1))
+        FP = tf.count_nonzero(pre * (self.__y - 1))
+        FN = tf.count_nonzero((pre - 1) * self.__y)
+        precision = TP / (TP + FP)
+        recall = TP / (TP + FN)
+        f1 = 2 * precision * recall / (precision + recall)
+        return pre, accuracy, f1

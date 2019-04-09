@@ -38,20 +38,11 @@ if __name__ == '__main__':
     test_x = np.vstack((test_good_data, test_bad_data))
 
     # expand the number of bad data for train
-    add_noise = int((len(train_good_data) - len(train_bad_data_origin)) * add_noise_radio)
-    transition = len(train_good_data) - add_noise - len(train_bad_data_origin)
-    if add_noise and transition:
-        result1 = util.add_noise(train_bad_data_origin, add_noise, 1)
-        result2 = util.transition(train_bad_data_origin, transition, 2)
-        train_bad_data = np.vstack((result1, result2, train_bad_data_origin))
-    else:
-        train_bad_data = train_bad_data_origin
+    train_x = np.vstack((train_good_data, train_bad_data_origin))
+    train_y = np.array([1.] * len(train_good_data) + [0.] * len(train_bad_data_origin), dtype=np.float).reshape(
+        (len(train_bad_data_origin) + len(train_good_data), 1))
 
-    assert len(train_bad_data) == len(train_good_data)
-    # construct train data
-    train_y = np.array([1.] * len(train_good_data) + [0.] * len(train_bad_data), dtype=np.float).reshape(
-        (len(train_bad_data) + len(train_good_data), 1))
-    train_x = np.vstack((train_good_data, train_bad_data))
+    train_x, train_y, num_expand = util.expand(train_x, train_y)
 
     # regularize
     for i in range(len(train_x)):
@@ -70,9 +61,9 @@ if __name__ == '__main__':
     log.log_info('convolution layers: ' + str(conv_layers))
     log.log_info('filters: ' + str(filters))
     log.log_info('full connected layers: ' + str(fc_layers))
-    log.log_info('learning rate: ' + str(learning_rate))
+    log.log_info('learning rate: %f' % learning_rate)
     log.log_info('keep prob: ' + str(keep_prob))
-    log.log_info('the number of expanding bad data: ' + str(add_noise + transition))
+    log.log_info('the number of expanding bad data: ' + str(num_expand))
     log.log_info('mini batch size: ' + str(mini_batch_size))
 
     if mini_batch_size != 0:
@@ -93,7 +84,7 @@ if __name__ == '__main__':
     cnn.forward()
     cost = cnn.cost()
     optimizer = cnn.get_optimizer(cost)
-    predict, accuracy = cnn.predict()
+    predict, accuracy, f1 = cnn.predict()
 
     init = tf.global_variables_initializer()
 
@@ -123,6 +114,8 @@ if __name__ == '__main__':
                                               feed_dict={cnn.x: train_x, cnn.y: train_y, cnn.keep_prob: 1})
             test_accuracy = sess.run(accuracy, feed_dict={cnn.x: test_x, cnn.y: test_y, cnn.keep_prob: 1})
 
+            f1_test = sess.run(f1, feed_dict={cnn.x: test_x, cnn.y: test_y, cnn.keep_prob: 1})
+
             cost_log.append(cost_value)
             train_log.append(train_accuracy)
             test_log.append(test_accuracy)
@@ -132,7 +125,8 @@ if __name__ == '__main__':
                 info = '\nIteration %d\n' % i + \
                        'Cost: %f\n' % cost_value + \
                        'Train accuracy: %f\n' % train_accuracy + \
-                       'Test accuracy: %f' % test_accuracy
+                       'Test accuracy: %f\n' % test_accuracy + \
+                       'F1: %f' % f1_test
                 log.log_info(info)
 
     plt.figure()

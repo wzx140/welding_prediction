@@ -5,6 +5,7 @@
 - matplotlib
 - git LFS
 - tensorflow
+- imblearn
 
 ### OPTIONAL
 - tensorflow-gpu
@@ -20,11 +21,11 @@ Implemented Dropout
 - set *keep_prob* in *config.py* range from 0~1. 1 means Dropout is disabled
 
 ####  DATA AUGMENTATION
-Since we only have 50 bad samples, we use transition and adding noise to expand the bad samples. You can change the number of data we used to train in `config.py`. But we always keep number of bad equals good by equip noise and transtition.
-- Adding noise means that add random number to each time of each dim of data. In my project, I use -0.5~0.5.
-    - you can change the ratio of add noise number in `config.py`
-- Transtition means that make the data whole up or down. In my project, I use -1~1
-    - the rest of sample we need except adding noise is generate by transtition
+Since we only have 50 bad samples, we use ADASYN to expand the bad samples. 
+
+Morever we also use F1 score to evaluation model.
+
+For more information, you can read my blog about [ADASYN](https://masterwangzx.com/2019/04/08/SMOTE/#adasyn)
  
 #### VISUALIZATION
 The log is in `log/log.txt` when program execution completed. You can visualize the data in `log/log.txt` with a nice table. You should install prettytable with pip
