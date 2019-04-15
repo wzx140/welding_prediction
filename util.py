@@ -40,7 +40,7 @@ def load_data(load_num_good: int = 2000):
 
 def regularize(matrix: np.ndarray, axis: int = 0):
     """
-    make the data's standard deviation is 1 and mean is 0 through axis 0 or 1
+    make the data range from 0~1
 
     :param matrix:
     :param axis: 0->vertical operation, 1->horizontal operation
@@ -48,9 +48,9 @@ def regularize(matrix: np.ndarray, axis: int = 0):
     :exception: the initial standard deviation in axis must not be 0
     """
     assert axis == 0 or axis == 1
-    mean = np.mean(matrix, axis=axis, keepdims=True)
-    std = np.std(matrix, axis=axis, keepdims=True)
-    return (matrix - mean) / std
+    min_ = np.min(matrix, axis=axis, keepdims=True)
+    max_ = np.max(matrix, axis=axis, keepdims=True)
+    return (matrix - min_) / (max_ - min_)
 
 
 def shuffle_data(data, label):
@@ -141,6 +141,6 @@ def expand(x: np.ndarray, y: np.ndarray):
     :param y:
     :return:
     """
-    ada = ADASYN()
+    ada = ADASYN(sampling_strategy=1)
     x_res, y_res = ada.fit_resample(x.reshape(-1, 600 * 3), y.reshape(-1))
     return x_res.reshape(-1, 600, 3), y_res.reshape(-1, 1), len(x_res.reshape(-1, 600, 3)) - len(x)
