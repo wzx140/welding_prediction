@@ -49,5 +49,6 @@ If you want to use **tfdbg**, you should,
 > For more information, you can read [official document](https://www.tensorflow.org/guide/debugger)
 
 ### MORE
-- model's accuracy is about 0.95
+- CNN model's accuracy is about 0.95
 - see the [demo](./demo.ipynb)
+- we implement more model like [DTW](./other/DTW.ipynb), [MDS](./other/MDS.ipynb) etc. to classify our data.
