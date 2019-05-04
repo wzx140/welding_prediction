@@ -207,3 +207,120 @@ Train accuracy: 0.997942
 Test accuracy: 0.966667
 F1: 0.965517
 2019-04-09 19:37:39,930 - tensorflow - INFO - program end
+2019-05-04 15:25:19,000 - tensorflow - INFO - program start
+2019-05-04 15:25:19,688 - tensorflow - INFO - convolution layers: [18, 0, 36, 0, 72, -1, 0, 144]
+2019-05-04 15:25:19,688 - tensorflow - INFO - filters: [(2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), 0, (2, 2, 'SAME'), (2, 1, 'SAME')]
+2019-05-04 15:25:19,688 - tensorflow - INFO - full connected layers: []
+2019-05-04 15:25:19,688 - tensorflow - INFO - learning rate: 0.000050
+2019-05-04 15:25:19,688 - tensorflow - INFO - keep prob: 0.3
+2019-05-04 15:25:19,688 - tensorflow - INFO - the number of expanding bad data: 454
+2019-05-04 15:25:19,688 - tensorflow - INFO - mini batch size: 64
+2019-05-04 15:25:28,868 - tensorflow - INFO - 
+Iteration 1
+Cost: 0.722946
+Train accuracy: 0.502053
+Test accuracy: 0.500000
+F1: nan
+2019-05-04 15:26:32,118 - tensorflow - INFO - program start
+2019-05-04 15:26:32,821 - tensorflow - INFO - convolution layers: [18, 0, 36, 0, 72, -1, 0, 144]
+2019-05-04 15:26:32,821 - tensorflow - INFO - filters: [(2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), 0, (2, 2, 'SAME'), (2, 1, 'SAME')]
+2019-05-04 15:26:32,821 - tensorflow - INFO - full connected layers: []
+2019-05-04 15:26:32,821 - tensorflow - INFO - learning rate: 0.000050
+2019-05-04 15:26:32,821 - tensorflow - INFO - keep prob: 0.3
+2019-05-04 15:26:32,821 - tensorflow - INFO - the number of expanding bad data: 450
+2019-05-04 15:26:32,821 - tensorflow - INFO - mini batch size: 64
+2019-05-04 15:26:41,167 - tensorflow - INFO - 
+Iteration 1
+Cost: 0.729174
+Train accuracy: 0.500000
+Test accuracy: 0.500000
+F1: nan
+2019-05-04 15:27:17,597 - tensorflow - INFO - program start
+2019-05-04 15:27:18,628 - tensorflow - INFO - convolution layers: [18, 0, 36, 0, 72, -1, 0, 144]
+2019-05-04 15:27:18,628 - tensorflow - INFO - filters: [(2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), 0, (2, 2, 'SAME'), (2, 1, 'SAME')]
+2019-05-04 15:27:18,644 - tensorflow - INFO - full connected layers: []
+2019-05-04 15:27:18,644 - tensorflow - INFO - learning rate: 0.000050
+2019-05-04 15:27:18,644 - tensorflow - INFO - keep prob: 0.3
+2019-05-04 15:27:18,644 - tensorflow - INFO - the number of expanding bad data: 952
+2019-05-04 15:27:18,644 - tensorflow - INFO - mini batch size: 64
+2019-05-04 15:27:32,331 - tensorflow - INFO - 
+Iteration 1
+Cost: 0.704534
+Train accuracy: 0.500507
+Test accuracy: 0.500000
+F1: nan
+2019-05-04 15:29:03,399 - tensorflow - INFO - 
+Iteration 10
+Cost: 0.147310
+Train accuracy: 0.934584
+Test accuracy: 0.933333
+F1: 0.928571
+2019-05-04 15:30:45,276 - tensorflow - INFO - 
+Iteration 20
+Cost: 0.098057
+Train accuracy: 0.971095
+Test accuracy: 1.000000
+F1: 1.000000
+2019-05-04 15:39:38,205 - tensorflow - INFO - program start
+2019-05-04 15:39:39,970 - tensorflow - INFO - convolution layers: [18, 0, 36, 0, 72, -1, 0, 144]
+2019-05-04 15:39:39,970 - tensorflow - INFO - filters: [(2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), 0, (2, 2, 'SAME'), (2, 1, 'SAME')]
+2019-05-04 15:39:39,970 - tensorflow - INFO - full connected layers: []
+2019-05-04 15:39:39,970 - tensorflow - INFO - learning rate: 0.000050
+2019-05-04 15:39:39,970 - tensorflow - INFO - keep prob: 0.3
+2019-05-04 15:39:39,970 - tensorflow - INFO - the number of expanding bad data: 949
+2019-05-04 15:39:39,970 - tensorflow - INFO - mini batch size: 64
+2019-05-04 15:40:28,140 - tensorflow - INFO - 
+Iteration 1
+Cost: 0.702347
+Train accuracy: 0.499746
+Test accuracy: 0.500000
+F1: nan
+2019-05-04 15:40:57,595 - tensorflow - INFO - 
+Iteration 10
+Cost: 0.157044
+Train accuracy: 0.935500
+Test accuracy: 0.933333
+F1: 0.928571
+2019-05-04 15:41:30,308 - tensorflow - INFO - 
+Iteration 20
+Cost: 0.098526
+Train accuracy: 0.965465
+Test accuracy: 0.933333
+F1: 0.933333
+2019-05-04 15:42:02,992 - tensorflow - INFO - 
+Iteration 30
+Cost: 0.076272
+Train accuracy: 0.969528
+Test accuracy: 0.933333
+F1: 0.933333
+2019-05-04 15:42:35,666 - tensorflow - INFO - 
+Iteration 40
+Cost: 0.058086
+Train accuracy: 0.980193
+Test accuracy: 0.966667
+F1: 0.967742
+2019-05-04 15:43:08,365 - tensorflow - INFO - 
+Iteration 50
+Cost: 0.046301
+Train accuracy: 0.985780
+Test accuracy: 0.966667
+F1: 0.967742
+2019-05-04 15:43:41,039 - tensorflow - INFO - 
+Iteration 60
+Cost: 0.041778
+Train accuracy: 0.985780
+Test accuracy: 0.966667
+F1: 0.967742
+2019-05-04 15:44:13,727 - tensorflow - INFO - 
+Iteration 70
+Cost: 0.035327
+Train accuracy: 0.985780
+Test accuracy: 0.966667
+F1: 0.967742
+2019-05-04 15:44:26,790 - tensorflow - INFO - 
+Iteration 74
+Cost: 0.036655
+Train accuracy: 0.990350
+Test accuracy: 0.966667
+F1: 0.967742
+2019-05-04 15:44:41,777 - tensorflow - INFO - program end

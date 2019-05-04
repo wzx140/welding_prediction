@@ -129,6 +129,16 @@ if __name__ == '__main__':
                        'F1: %f' % f1_test
                 log.log_info(info)
 
+            # stop when test>0.95 and train>0.98
+            if test_accuracy >= 0.95 and train_accuracy >= 0.99:
+                info = '\nIteration %d\n' % i + \
+                       'Cost: %f\n' % cost_value + \
+                       'Train accuracy: %f\n' % train_accuracy + \
+                       'Test accuracy: %f\n' % test_accuracy + \
+                       'F1: %f' % f1_test
+                log.log_info(info)
+                break
+
     plt.figure()
     plt.subplot(121)
     plt.xlabel('Iteration')

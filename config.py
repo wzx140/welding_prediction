@@ -25,4 +25,4 @@ enable_debug = False
 keep_prob = 0.3
 
 # the number of data for train and test
-num_data = 1000
+num_data = 2000
