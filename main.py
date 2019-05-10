@@ -73,25 +73,25 @@ if __name__ == '__main__':
     (m, n_W0, n_C0) = train_x.shape
     n_y = train_y.shape[1]
 
-    # log the cost and accuracy
-    cost_log = []
-    test_log = []
-    train_log = []
-    x = []
-
     # construction calculation graph
     cnn.initialize(n_W0, n_C0, n_y)
-    cnn.forward()
     cost = cnn.cost()
     optimizer = cnn.get_optimizer(cost)
-    predict, accuracy, f1 = cnn.predict()
+    predict, accuracy = cnn.predict()
 
     init = tf.global_variables_initializer()
 
     with tf.Session() as sess:
-        sess.run(init)
+
+        # log for tensorboard
+        merged = tf.summary.merge_all()
+        train_writer = tf.summary.FileWriter("log/tsb/train", sess.graph)
+        test_writer = tf.summary.FileWriter("log/tsb/test")
+
         if enable_debug:
             sess = tf_debug.LocalCLIDebugWrapperSession(sess)
+
+        sess.run(init)
 
         for i in range(1, num_epochs + 1):
             if mini_batch_size != 0:
@@ -110,23 +110,20 @@ if __name__ == '__main__':
                                          feed_dict={cnn.x: train_x, cnn.y: train_y, cnn.keep_prob: keep_prob})
 
             # disable dropout
-            train_accuracy, output = sess.run([accuracy, predict],
-                                              feed_dict={cnn.x: train_x, cnn.y: train_y, cnn.keep_prob: 1})
-            test_accuracy = sess.run(accuracy, feed_dict={cnn.x: test_x, cnn.y: test_y, cnn.keep_prob: 1})
+            summary_train, train_accuracy = sess.run([merged, accuracy],
+                                                     feed_dict={cnn.x: train_x, cnn.y: train_y,
+                                                                cnn.keep_prob: 1})
+            summary_test, test_accuracy = sess.run([merged, accuracy],
+                                                   feed_dict={cnn.x: test_x, cnn.y: test_y, cnn.keep_prob: 1})
 
-            f1_test = sess.run(f1, feed_dict={cnn.x: test_x, cnn.y: test_y, cnn.keep_prob: 1})
-
-            cost_log.append(cost_value)
-            train_log.append(train_accuracy)
-            test_log.append(test_accuracy)
-            x.append(i)
+            train_writer.add_summary(summary_train, i - 1)
+            test_writer.add_summary(summary_test, i - 1)
 
             if print_detail and (i % 10 == 0 or i == 1):
                 info = '\nIteration %d\n' % i + \
                        'Cost: %f\n' % cost_value + \
                        'Train accuracy: %f\n' % train_accuracy + \
-                       'Test accuracy: %f\n' % test_accuracy + \
-                       'F1: %f' % f1_test
+                       'Test accuracy: %f' % test_accuracy
                 log.log_info(info)
 
             # stop when test>0.95 and train>0.98
@@ -134,25 +131,10 @@ if __name__ == '__main__':
                 info = '\nIteration %d\n' % i + \
                        'Cost: %f\n' % cost_value + \
                        'Train accuracy: %f\n' % train_accuracy + \
-                       'Test accuracy: %f\n' % test_accuracy + \
-                       'F1: %f' % f1_test
+                       'Test accuracy: %f' % test_accuracy
                 log.log_info(info)
                 break
-
-    plt.figure()
-    plt.subplot(121)
-    plt.xlabel('Iteration')
-    plt.ylabel('Cost')
-    plt.plot(x, cost_log)
-
-    plt.subplot(122)
-    plt.xlabel('Iteration')
-    plt.ylabel('Accuracy')
-    plt.ylim(0, 1)
-    plt.plot(x, train_log, label='train accuracy')
-    plt.plot(x, test_log, label='test accuracy')
-    plt.legend()
-
-    plt.show()
+        train_writer.close()
+        test_writer.close()
 
     log.log_info('program end')

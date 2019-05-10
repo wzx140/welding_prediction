@@ -24,80 +24,117 @@ class Cnn(object):
     def keep_prob(self):
         return self.__keep_prob
 
+    def __variable_summaries(self, var):
+        with tf.name_scope("summaries"):
+            mean = tf.reduce_mean(var)
+            tf.summary.scalar("mean", mean)
+        with tf.name_scope("stddev"):
+            stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
+            tf.summary.scalar("stddev", stddev)
+        tf.summary.scalar("max", tf.reduce_max(var))
+        tf.summary.scalar("min", tf.reduce_min(var))
+        tf.summary.histogram("histogram", var)
+
     def initialize(self, n_w0, n_c0, n_y):
         """
-        initialize the w, X, Y
+        initialize the w, X, Y and forward options
         :param n_w0: width of the image data
         :param n_c0: depth of the image data
         :param n_y: number of the labels
         :return:
         """
-        f = self.__filters
-        convs = self.__conv_layers
-        self.__x = tf.placeholder(tf.float32, (None, n_w0, n_c0), 'data_x')
-        self.__y = tf.placeholder(tf.float32, (None, n_y), 'data_y')
+        with tf.name_scope('input'):
+            self.__x = tf.placeholder(tf.float32, (None, n_w0, n_c0), 'data_x')
+            self.__y = tf.placeholder(tf.float32, (None, n_y), 'data_y')
 
-        # first convolution layer
-        self.__param['W1'] = tf.get_variable('W1', (f[0][0], n_c0, convs[0]),
-                                             initializer=tf.contrib.layers.xavier_initializer())
-        conv_index = 1
-        for i in range(1, len(convs)):
-            if convs[i] != 0 and convs[i] != -1:
-                self.__param['W' + str(conv_index + 1)] = tf.get_variable('W' + str(conv_index + 1), (
-                    f[i][0], self.__param['W' + str(conv_index)].shape[2], convs[i]),
-                                                                          initializer=tf.contrib.layers.xavier_initializer())
-                conv_index += 1
-
-    def forward(self):
         param = self.__param
         f = self.__filters
         convs = self.__conv_layers
         fcs = self.__fc_layers
         a_pre = self.__x
 
-        conv_index = 0
-
-        # convolution forward
+        # convolutional layers
+        conv_index = 1
+        shape = n_c0
         for i in range(len(convs)):
             if convs[i] == 0:
-                a = tf.nn.pool(a_pre, window_shape=[f[i][0]], padding=f[i][2], pooling_type="MAX")
+                with tf.name_scope('conv' + str(conv_index) + '/'):
+                    with tf.name_scope('max_pool'):
+                        a = tf.nn.pool(a_pre, window_shape=[f[i][0]], padding=f[i][2], pooling_type="MAX")
                 a_pre = a
             elif convs[i] == -1:
-                a = tf.nn.dropout(a_pre, keep_prob=self.__keep_prob)
+                with tf.name_scope('conv' + str(conv_index) + '/'):
+                    with tf.name_scope('dropout'):
+                        a = tf.nn.dropout(a_pre, keep_prob=self.__keep_prob)
                 a_pre = a
             else:
-                z = tf.nn.conv1d(a_pre, param['W' + str(conv_index + 1)], stride=f[i][1], padding=f[i][2])
-                a = tf.nn.relu(z)
+                a = self.__conv_layer(a_pre, f[i][0], shape, convs[i], 'conv' + str(conv_index), stride=f[i][1],
+                                      padding=f[i][2],
+                                      act=tf.identity)
+                shape = convs[i]
                 a_pre = a
                 conv_index += 1
+        # flatten
+        with tf.name_scope('flatten'):
+            a_pre = tf.reshape(a, [-1, int(a_pre.shape[1]) * int(a_pre.shape[2])])
 
         # full connected forward
-        a_pre = tf.contrib.layers.flatten(a)
-        a_pre = tf.nn.dropout(a_pre, keep_prob=self.__keep_prob)
+        i = 0
         for i in range(len(fcs)):
-            a = tf.contrib.layers.fully_connected(a_pre, fcs[i])
+            a = self.__fc_layer(a_pre, int(a_pre.shape[1]), fcs[i], 'fc' + str(i + 1))
             a_pre = a
-        a = tf.contrib.layers.fully_connected(a_pre, 1, activation_fn=None)
+        a = self.__fc_layer(a_pre, int(a_pre.shape[1]), 1, 'fc' + str(i + 1), act=tf.identity)
         self.__a = a
 
+    def __fc_layer(self, input_tensor, input_dim, output_dim, layer_name, act=tf.nn.relu):
+        with tf.name_scope(layer_name):
+            with tf.name_scope('weights'):
+                initial = tf.truncated_normal([input_dim, output_dim], stddev=0.1)
+                weights = tf.Variable(initial)
+                self.__variable_summaries(weights)
+            with tf.name_scope('biases'):
+                initial = tf.constant(0.1, shape=[output_dim], dtype=np.float)
+                biases = tf.Variable(initial)
+                self.__variable_summaries(biases)
+            with tf.name_scope('Wx_plus_b'):
+                preactivate = tf.matmul(input_tensor, weights) + biases
+                tf.summary.histogram('pre_activations', preactivate)
+            activations = act(preactivate, name='activation')
+            tf.summary.histogram('activations', activations)
+            return activations
+
+    def __conv_layer(self, input_tensor, kernel_size, input_dim, output_dim, layer_name, stride, padding,
+                     act=tf.nn.relu):
+        with tf.name_scope(layer_name):
+            with tf.name_scope('weights'):
+                initial = tf.truncated_normal([kernel_size, input_dim, output_dim], stddev=0.1)
+                weights = tf.Variable(initial)
+                self.__variable_summaries(weights)
+            with tf.name_scope('biases'):
+                initial = tf.constant(0.1, shape=[output_dim], dtype=np.float)
+                biases = tf.Variable(initial)
+                self.__variable_summaries(biases)
+            with tf.name_scope('W_conv_x_plus_b'):
+                preactivate = tf.nn.conv1d(input_tensor, weights, stride=stride, padding=padding) + biases
+                tf.summary.histogram('pre_activations', preactivate)
+            activations = act(preactivate, name='activation')
+            tf.summary.histogram('activations', activations)
+            return activations
+
     def cost(self):
-        cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.__a, labels=self.__y))
+        with tf.name_scope("loss/"):
+            cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.__a, labels=self.__y))
+        tf.summary.scalar("loss", cost)
         return cost
 
     def get_optimizer(self, cost):
-        adam = tf.train.AdamOptimizer(self.__lr).minimize(cost)
+        with tf.name_scope("train"):
+            adam = tf.train.AdamOptimizer(self.__lr).minimize(cost)
         return adam
 
     def predict(self):
-        pre = tf.cast(tf.greater(self.__a, 0.5), dtype=np.float, name='output')
-        accuracy = tf.reduce_mean(tf.cast(tf.equal(pre, self.__y), "float"))
-
-        # calculate f1_score
-        TP = tf.count_nonzero(pre * self.__y)
-        TN = tf.count_nonzero((pre - 1) * (self.__y - 1))
-        FP = tf.count_nonzero(pre * (self.__y - 1))
-        FN = tf.count_nonzero((pre - 1) * self.__y)
-        precision = TP / (TP + FP)
-        recall = TP / (TP + FN)
-        f1 = 2 * precision * recall / (precision + recall)
-        return pre, accuracy, f1
+        with tf.name_scope("accuracy"):
+            pre = tf.cast(tf.greater(self.__a, 0.5), dtype=np.float)
+            accuracy = tf.reduce_mean(tf.cast(tf.equal(pre, self.__y), "float"))
+            tf.summary.scalar("accuracy", accuracy)
+        return pre, accuracy
