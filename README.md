@@ -2,7 +2,6 @@
 ### PREREQUISITES
 - numpy
 - h5py
-- matplotlib
 - git LFS
 - tensorflow
 - imblearn
@@ -31,6 +30,10 @@ For more information, you can read my blog about [ADASYN](https://masterwangzx.c
 The log is in `log/log.txt` when program execution completed. You can visualize the data in `log/log.txt` with a nice table. You should install prettytable with pip
 
 Before you run `visualization.py`, you should have more than one complete operational process with `main.py`
+
+### TENSORBOARD
+After run `main.py`, the data for tensorboard will store in `log/tsb`. Just run `tensorboard --logdir=log/tsb`
+> You should clean the data in log/tsb/test and log/tsb/train
 
 ### RUN
 - `git clone git@github.com:wzx140/welding_prediction.git`. This process may be very slow for we also downloading the data for train by `git LFS` 
