@@ -5,7 +5,6 @@ import numpy as np
 class Cnn(object):
 
     def __init__(self, conv_layers, fc_layers, filters, learning_rate):
-        self.__param = {}
         self.__conv_layers = conv_layers
         self.__fc_layers = fc_layers
         self.__filters = filters
@@ -25,15 +24,15 @@ class Cnn(object):
         return self.__keep_prob
 
     def __variable_summaries(self, var):
-        with tf.name_scope("summaries"):
-            mean = tf.reduce_mean(var)
-            tf.summary.scalar("mean", mean)
-        with tf.name_scope("stddev"):
+        """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
+        mean = tf.reduce_mean(var)
+        tf.summary.scalar('mean_value', mean)
+        with tf.name_scope('stddev'):
             stddev = tf.sqrt(tf.reduce_mean(tf.square(var - mean)))
-            tf.summary.scalar("stddev", stddev)
-        tf.summary.scalar("max", tf.reduce_max(var))
-        tf.summary.scalar("min", tf.reduce_min(var))
-        tf.summary.histogram("histogram", var)
+        tf.summary.scalar('stddev_value', stddev)
+        tf.summary.scalar('max_value', tf.reduce_max(var))
+        tf.summary.scalar('min_value', tf.reduce_min(var))
+        tf.summary.histogram('histogram', var)
 
     def initialize(self, n_w0, n_c0, n_y):
         """
@@ -47,7 +46,6 @@ class Cnn(object):
             self.__x = tf.placeholder(tf.float32, (None, n_w0, n_c0), 'data_x')
             self.__y = tf.placeholder(tf.float32, (None, n_y), 'data_y')
 
-        param = self.__param
         f = self.__filters
         convs = self.__conv_layers
         fcs = self.__fc_layers
@@ -58,19 +56,16 @@ class Cnn(object):
         shape = n_c0
         for i in range(len(convs)):
             if convs[i] == 0:
-                with tf.name_scope('conv' + str(conv_index) + '/'):
-                    with tf.name_scope('max_pool'):
-                        a = tf.nn.pool(a_pre, window_shape=[f[i][0]], padding=f[i][2], pooling_type="MAX")
-                a_pre = a
+                with tf.name_scope('conv' + str(conv_index - 1) + '/'):
+                    a = tf.nn.pool(a_pre, window_shape=[f[i][0]], padding=f[i][2], pooling_type="MAX")
+                    a_pre = a
             elif convs[i] == -1:
-                with tf.name_scope('conv' + str(conv_index) + '/'):
-                    with tf.name_scope('dropout'):
-                        a = tf.nn.dropout(a_pre, keep_prob=self.__keep_prob)
+                with tf.name_scope('conv' + str(conv_index - 1) + '/'):
+                    a = tf.nn.dropout(a_pre, keep_prob=self.__keep_prob)
                 a_pre = a
             else:
                 a = self.__conv_layer(a_pre, f[i][0], shape, convs[i], 'conv' + str(conv_index), stride=f[i][1],
-                                      padding=f[i][2],
-                                      act=tf.identity)
+                                      padding=f[i][2])
                 shape = convs[i]
                 a_pre = a
                 conv_index += 1
@@ -116,15 +111,15 @@ class Cnn(object):
                 self.__variable_summaries(biases)
             with tf.name_scope('W_conv_x_plus_b'):
                 preactivate = tf.nn.conv1d(input_tensor, weights, stride=stride, padding=padding) + biases
-                tf.summary.histogram('pre_activations', preactivate)
+            tf.summary.histogram('pre_activations', preactivate)
             activations = act(preactivate, name='activation')
             tf.summary.histogram('activations', activations)
             return activations
 
     def cost(self):
-        with tf.name_scope("loss/"):
+        with tf.name_scope("loss"):
             cost = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=self.__a, labels=self.__y))
-        tf.summary.scalar("loss", cost)
+            tf.summary.scalar("loss", cost)
         return cost
 
     def get_optimizer(self, cost):

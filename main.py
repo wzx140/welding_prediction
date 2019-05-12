@@ -3,6 +3,7 @@ import tensorflow as tf
 # for debug
 from tensorflow.python import debug as tf_debug
 import numpy as np
+from datetime import datetime
 
 from log import log
 import util
@@ -10,6 +11,7 @@ from config import *
 from cnn import Cnn
 
 if __name__ == '__main__':
+    TIMESTAMP = "{0:%Y-%m-%d-%H-%M/}".format(datetime.now())
     log.log_info('program start')
     data, num_good, num_bad = util.load_data(num_data // 2)
     log.log_debug('Data loading completed')
@@ -85,8 +87,8 @@ if __name__ == '__main__':
 
         # log for tensorboard
         merged = tf.summary.merge_all()
-        train_writer = tf.summary.FileWriter("log/tsb/train", sess.graph)
-        test_writer = tf.summary.FileWriter("log/tsb/test")
+        train_writer = tf.summary.FileWriter("log/tsb/train/" + TIMESTAMP, sess.graph)
+        test_writer = tf.summary.FileWriter("log/tsb/test/" + TIMESTAMP)
 
         if enable_debug:
             sess = tf_debug.LocalCLIDebugWrapperSession(sess)
