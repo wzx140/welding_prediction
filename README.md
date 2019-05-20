@@ -8,7 +8,6 @@
 
 ### OPTIONAL
 - tensorflow-gpu
-- prettytable
 
 ### Introduction
 According to the curve waveform of voltage, current and electrode position, judge the quality of flash welding. The data is multi-dimensional time series. We have 2000 of good quality and 50 of bad quality. In this network, I use data augmentation to increase the number of bad. **Experiments show that CNN is more effective than BP-network and Dropout is effective.** I think convolution can identify the relative positional relationship between multi-dimensional time series, which reduces the over-fitting of the model to some extent.
@@ -25,15 +24,9 @@ Since we only have 50 bad samples, we use ADASYN to expand the bad samples.
 Morever we also use F1 score to evaluation model.
 
 For more information, you can read my blog about [ADASYN](https://masterwangzx.com/2019/04/08/SMOTE/#adasyn)
- 
-#### VISUALIZATION
-The log is in `log/log.txt` when program execution completed. You can visualize the data in `log/log.txt` with a nice table. You should install prettytable with pip
-
-Before you run `visualization.py`, you should have more than one complete operational process with `main.py`
 
 ### TENSORBOARD
 After run `main.py`, the data for tensorboard will store in `log/tsb`. Just run `tensorboard --logdir=log/tsb`
-> You should clean the data in log/tsb/test and log/tsb/train
 
 ### RUN
 - `git clone git@github.com:wzx140/welding_prediction.git`. This process may be very slow for we also downloading the data for train by `git LFS` 
@@ -41,8 +34,8 @@ After run `main.py`, the data for tensorboard will store in `log/tsb`. Just run 
 - `cd welding_prediction`
 - `python main.py`
 
-For visualization
-- `python log/visualization.py`
+For tensorboard
+- `tensorboard --logdir log/tsb`
 
 ### DEBUG
 If you want to use **tfdbg**, you should,
@@ -52,6 +45,6 @@ If you want to use **tfdbg**, you should,
 > For more information, you can read [official document](https://www.tensorflow.org/guide/debugger)
 
 ### MORE
-- CNN model's accuracy is about 0.95
+- CNN model's test accuracy is more than 0.96 and train accuracy is more than 0.99
 - see the [demo](./demo.ipynb)
-- we implement more model like [DTW](./other/DTW.ipynb), [MDS](./other/MDS.ipynb) etc. to classify our data.
+- we implement more model like [DTW](./other/DTW.ipynb) and [MDS](./other/MDS.ipynb), [MDS](./other/MDS.ipynb) etc. to classify our data.

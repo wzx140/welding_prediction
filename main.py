@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import tensorflow as tf
 # for debug
 from tensorflow.python import debug as tf_debug
@@ -128,7 +127,7 @@ if __name__ == '__main__':
                        'Test accuracy: %f' % test_accuracy
                 log.log_info(info)
 
-            # stop when test>0.95 and train>0.98
+            # stop when test>0.95 and train>0.99
             if test_accuracy >= 0.95 and train_accuracy >= 0.99:
                 info = '\nIteration %d\n' % i + \
                        'Cost: %f\n' % cost_value + \

@@ -24,7 +24,11 @@ class Cnn(object):
         return self.__keep_prob
 
     def __variable_summaries(self, var):
-        """Attach a lot of summaries to a Tensor (for TensorBoard visualization)."""
+        """
+        Attach a lot of summaries to a Tensor (for TensorBoard visualization)
+        :param var
+        :return:
+        """
         mean = tf.reduce_mean(var)
         tf.summary.scalar('mean_value', mean)
         with tf.name_scope('stddev'):

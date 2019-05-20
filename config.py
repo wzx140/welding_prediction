@@ -9,7 +9,7 @@ filters = [(2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1
 # the dims of full connected layers. The last layer is 1 and you do not need to write it on
 fc_layers = []
 
-learning_rate = 0.0001
+learning_rate = 0.0005
 
 num_epochs = 200
 
@@ -22,7 +22,7 @@ print_detail = True
 enable_debug = False
 
 # regularization
-keep_prob = 0.5
+keep_prob = 0.3
 
 # the number of data for train and test
 num_data = 1500
