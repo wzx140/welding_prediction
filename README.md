@@ -19,8 +19,9 @@ According to the curve waveform of voltage, current and electrode position, judg
 - `conda install --yes --file requirements.txt`. Import dependency to anaconda
 - change some variables in *config.py*
 - `cd welding_prediction`
-- `python main.py`
+- `python main.py train` to train the model and save the model in `log/mode`. There is a trained model in this folder
 - `tensorboard --logdir log/tsb`, to see the visualization of the data after training
+- `python main.py predict 0 100 path-to-mode`, predict 0~99 data in `dataSets/data.h5` by using the mode save in path-to-mode
 
 ### Features
 
@@ -34,13 +35,13 @@ Since we only have 50 bad samples, we use ADASYN to expand the bad samples.
 For more information, you can read my blog about [ADASYN](https://masterwangzx.com/2019/04/08/SMOTE/#adasyn)
 
 #### TENSORBOARD
-After run `main.py`, the data for tensorboard will store in `log/tsb`. Just run `tensorboard --logdir log/tsb`
+After training, the data for tensorboard will store in `log/tsb`. Just run `tensorboard --logdir log/tsb`
 
 #### DEBUG
 If you want to use **tfdbg**, you should,
 - install *pyreadline* by pip
 - set *enable_debug* True in *config.py*
-- run `python main.py --debug` in project dir
+- run `python main.py train --debug` in project dir
 > For more information, you can read [official document](https://www.tensorflow.org/guide/debugger)
 
 ## DEMO

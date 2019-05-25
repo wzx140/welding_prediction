@@ -17,8 +17,9 @@
 - `git clone git@github.com:wzx140/welding_prediction.git`. 这个过程将会缓慢，因为训练数据集很大并且储存在 `git LFS`上
 - 修改 *config.py* 中的参数
 - `cd welding_prediction`
-- `python main.py`
+- `python main.py train`，训练模型并将模型保存在`log/mode`中。此文件夹中有训练好的模型
 - `tensorboard --logdir log/tsb`, 可以看到训练过程参数的可视化结果
+- `python main.py predict 0 100 log/model/2019-05-25-17-10/`，使用储存在`log/model/2019-05-25-17-10/`中的模型去预测`dataSets/data.h5`中0~99的数据
 
 ### 特点
 
@@ -36,7 +37,7 @@
 如果你想要使用 **tfdbg**, 你应该,
 - 使用pip安装 *pyreadline* 
 - 令 *enable_debug* 参数的值为True 在 *config.py* 里
-- 运行 `python main.py --debug` 在工程文件夹里
+- 运行 `python main.py train --debug` 在工程文件夹里
 > 更多的信息, 你可以阅读 [官方文档](https://www.tensorflow.org/guide/debugger)
 
 ## 示例
