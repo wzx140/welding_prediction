@@ -38,6 +38,32 @@ def load_data(load_num_good: int = 2000):
     return data, num_good, num_bad
 
 
+def load_data_example(st_index: int, end_index: int):
+    """
+    load welding data, left closed right open
+    :param: st_index
+    :param: end_index
+    :return: plain data
+    """
+    data = []
+    with h5py.File(definitions.ROOT_DIR + 'dataSets/data.h5') as f:
+        # load good data
+        lengths = f['GOOD/LEN'][:]
+        count = 0
+        for num, length in enumerate(lengths):
+            data.append(f['GOOD/DATA'][count:count + length])
+            count += length
+
+        # load bad data
+        lengths = f['BAD/LEN'][:]
+        count = 0
+        for length in lengths:
+            data.append(f['BAD/DATA'][count:count + length])
+            count += length
+
+    return data[st_index:end_index]
+
+
 def regularize(matrix: np.ndarray, axis: int = 0):
     """
     make the data range from 0~1

@@ -133,7 +133,7 @@ class Cnn(object):
 
     def predict(self):
         with tf.name_scope("accuracy"):
-            pre = tf.cast(tf.greater(self.__a, 0.5), dtype=np.float)
+            pre = tf.cast(tf.greater(self.__a, 0.5), dtype=np.float, name='predict')
             accuracy = tf.reduce_mean(tf.cast(tf.equal(pre, self.__y), "float"))
             tf.summary.scalar("accuracy", accuracy)
         return pre, accuracy
