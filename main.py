@@ -1,3 +1,5 @@
+from argparse import ArgumentParser
+
 import tensorflow as tf
 # for debug
 from tensorflow.python import debug as tf_debug
@@ -9,7 +11,8 @@ import util
 from config import *
 from cnn import Cnn
 
-if __name__ == '__main__':
+
+def train():
     TIMESTAMP = "{0:%Y-%m-%d-%H-%M/}".format(datetime.now())
     log.log_info('program start')
     data, num_good, num_bad = util.load_data(num_data // 2)
@@ -81,6 +84,7 @@ if __name__ == '__main__':
     predict, accuracy = cnn.predict()
 
     init = tf.global_variables_initializer()
+    saver = tf.train.Saver()
 
     with tf.Session() as sess:
 
@@ -134,8 +138,48 @@ if __name__ == '__main__':
                        'Train accuracy: %f\n' % train_accuracy + \
                        'Test accuracy: %f' % test_accuracy
                 log.log_info(info)
+                saver.save(sess, "log/model/" + TIMESTAMP)
                 break
+            saver.save(sess, "log/model/" + TIMESTAMP)
         train_writer.close()
         test_writer.close()
 
     log.log_info('program end')
+
+
+def predict(path: str, data_x: np.ndarray):
+    # Pretreatment
+    data_x, length = util.resample(data_x, 600)
+    data_x = util.reshape(data_x, length)
+    for i in range(len(data_x)):
+        data_x[i, :, 0] = util.regularize(data_x[i, :, 0])
+        data_x[i, :, 1] = util.regularize(data_x[i, :, 1])
+        data_x[i, :, 2] = util.regularize(data_x[i, :, 2])
+
+    with tf.Session() as sess:
+        saver = tf.train.import_meta_graph(path + '.meta')
+        saver.restore(sess, path)
+        graph = tf.get_default_graph()
+        placehold_x = graph.get_tensor_by_name('input/data_x:0')
+        predict_value = graph.get_tensor_by_name('accuracy/predict:0')
+        keep_prob = graph.get_tensor_by_name('keep_prob:0')
+
+        return sess.run(predict_value, feed_dict={placehold_x: data_x, keep_prob: 1})
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description='Welding evaluation system')
+    subparsers = parser.add_subparsers(dest='command', description='command')
+
+    grade_parser = subparsers.add_parser('train', help='train the model. The parameter is defined in config.py')
+
+    class_parser = subparsers.add_parser('predict', help='predict the data with prepared weights')
+    class_parser.add_argument('start index', type=int, help='the start index of data')
+    class_parser.add_argument('end index', type=int, help='the end index of data')
+    class_parser.add_argument('weight', type=str, help='the path of the weight file. You should end with file separator')
+
+    args = vars(parser.parse_args())
+    if args['command'] == 'train':
+        train()
+    elif args['command'] == 'predict':
+        print(predict(args['weight'], util.load_data_example(args['start index'], args['end index'])))
