@@ -2,26 +2,26 @@
 - [Chinese](README_CN.md)
 ### PREREQUISITES
 - numpy
-- h5py
-- git LFS
 - tensorflow
 - imblearn
 
 ### OPTIONAL
 - tensorflow-gpu
+- sklearn
+- matplotlib
 
 ### Introduction
-According to the curve waveform of voltage, current and electrode position, judge the quality of flash welding. The data is multi-dimensional time series. We have 2000 of good quality and 50 of bad quality. In this network, I use data augmentation to increase the number of bad. **Experiments show that CNN is more effective than BP-network and Dropout is effective.** I think convolution can identify the relative positional relationship between multi-dimensional time series, which reduces the over-fitting of the model to some extent. As shown below, the origin data is multi-dimensional time series.
+According to the curve waveform of voltage, current and electrode position, judge the quality of flash welding. The data is multi-dimensional time series. We have 2000 of good quality and 50 of bad quality in `./data/`. In this network, I use data augmentation to increase the number of bad. **Experiments show that CNN is more effective than BP-network and Dropout is effective.** I think convolution can identify the relative positional relationship between multi-dimensional time series, which reduces the over-fitting of the model to some extent. As shown below, the origin data is multi-dimensional time series.
 <img src="img/data.png" width = "50%" />
 
 ### START
-- `git clone git@github.com:wzx140/welding_prediction.git`. This process may be very slow for we also downloading the data for train by `git LFS`
+- `git clone git@github.com:wzx140/welding_prediction.git`
 - `conda install --yes --file requirements.txt`. Import dependency to anaconda
 - change some variables in *config.py*
 - `cd welding_prediction`
 - `python main.py train` to train the model and save the model in `log/mode`. There is a trained model in this folder
 - `tensorboard --logdir log/tsb`, to see the visualization of the data after training
-- `python main.py predict 0 100 path-to-mode`, predict 0~99 data in `dataSets/data.h5` by using the mode save in path-to-mode
+- `python main.py predict path-to-mode path-to-sample` to predict the quality of the welding
 
 ### Features
 

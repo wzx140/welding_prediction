@@ -1,25 +1,25 @@
 ## 基于卷积神经网络的焊接评估系统
 ### 必备库
 - numpy
-- h5py
-- git LFS
 - tensorflow
 - imblearn
 
 ### 可选择的
 - tensorflow-gpu
+- sklearn
+- matplotlib
 
 ### 引言
-根据电压，电流和电极位置的曲线波形，判断闪光焊接的质量。数据是多维时间序列。我们有2000个质量好，50个质量差。 在这个网络中，我使用数据扩充来增加坏的数量。 **实验表明，CNN比BP网络更有效，Dropout是有效的。**我认为卷积可以识别多维时间序列之间的相对位置关系，这在一定程度上减少了模型的过度拟合。 如下所示，原始数据是多维时间序列。
+根据电压，电流和电极位置的曲线波形，判断闪光焊接的质量。数据是多维时间序列。我们有2000个质量好，50个质量差储存在`./data/`中。 在这个网络中，我使用数据扩充来增加坏的数量。 **实验表明，CNN比BP网络更有效，Dropout是有效的。**我认为卷积可以识别多维时间序列之间的相对位置关系，这在一定程度上减少了模型的过度拟合。 如下所示，原始数据是多维时间序列。
 <img src="img/data.png" width = "50%" />
 
 ### 开始
-- `git clone git@github.com:wzx140/welding_prediction.git`. 这个过程将会缓慢，因为训练数据集很大并且储存在 `git LFS`上
+- `git clone git@github.com:wzx140/welding_prediction.git`
 - 修改 *config.py* 中的参数
 - `cd welding_prediction`
 - `python main.py train`，训练模型并将模型保存在`log/mode`中。此文件夹中有训练好的模型
 - `tensorboard --logdir log/tsb`, 可以看到训练过程参数的可视化结果
-- `python main.py predict 0 100 log/model/2019-05-25-17-10/`，使用储存在`log/model/2019-05-25-17-10/`中的模型去预测`dataSets/data.h5`中0~99的数据
+- `python main.py predict path-to-mode path-to-sample` 去预测焊接质量
 
 ### 特点
 

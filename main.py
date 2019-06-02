@@ -15,7 +15,7 @@ from cnn import Cnn
 def train():
     TIMESTAMP = "{0:%Y-%m-%d-%H-%M/}".format(datetime.now())
     log.log_info('program start')
-    data, num_good, num_bad = util.load_data(num_data // 2)
+    data, num_good, num_bad = util.load_train_data(num_data // 2)
     log.log_debug('Data loading completed')
 
     # resample
@@ -149,6 +149,7 @@ def train():
 
 def predict(path: str, data_x: np.ndarray):
     # Pretreatment
+    data_x = [data_x]
     data_x, length = util.resample(data_x, 600)
     data_x = util.reshape(data_x, length)
     for i in range(len(data_x)):
@@ -164,7 +165,7 @@ def predict(path: str, data_x: np.ndarray):
         predict_value = graph.get_tensor_by_name('accuracy/predict:0')
         keep_prob = graph.get_tensor_by_name('keep_prob:0')
 
-        return sess.run(predict_value, feed_dict={placehold_x: data_x, keep_prob: 1})
+        return sess.run(predict_value, feed_dict={placehold_x: data_x, keep_prob: 1})[0][0]
 
 
 if __name__ == '__main__':
@@ -174,12 +175,12 @@ if __name__ == '__main__':
     grade_parser = subparsers.add_parser('train', help='train the model. The parameter is defined in config.py')
 
     class_parser = subparsers.add_parser('predict', help='predict the data with prepared weights')
-    class_parser.add_argument('start index', type=int, help='the start index of data')
-    class_parser.add_argument('end index', type=int, help='the end index of data')
-    class_parser.add_argument('weight', type=str, help='the path of the weight file. You should end with file separator')
+    class_parser.add_argument('weight', type=str,
+                              help='the path of the weight file. End with file seq eq "\\" or "/"')
+    class_parser.add_argument('sample', type=str, help='the path of data you want to predict')
 
     args = vars(parser.parse_args())
     if args['command'] == 'train':
         train()
     elif args['command'] == 'predict':
-        print(predict(args['weight'], util.load_data_example(args['start index'], args['end index'])))
+        print('good' if predict(args['weight'], util.load_data(args['sample'])) else 'bad')

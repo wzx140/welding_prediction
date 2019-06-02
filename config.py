@@ -9,7 +9,7 @@ filters = [(2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1, 'SAME'), (2, 2, 'SAME'), (2, 1
 # the dims of full connected layers. The last layer is 1 and you do not need to write it on
 fc_layers = []
 
-learning_rate = 0.0005
+learning_rate = 0.0001
 
 num_epochs = 200
 

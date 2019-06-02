@@ -1,12 +1,11 @@
+import csv
+import os
 import math
-import random
-import definitions
-import h5py
 import numpy as np
 from imblearn.over_sampling import ADASYN
 
 
-def load_data(load_num_good: int = 2000):
+def load_train_data(load_num_good: int = 2000):
     """
     load welding test and train data
     :param: load_num_good: 0->all
@@ -15,53 +14,38 @@ def load_data(load_num_good: int = 2000):
     data = []
     num_good = 0
     num_bad = 0
-    with h5py.File(definitions.ROOT_DIR + 'dataSets/data.h5') as f:
-        # load good data
-        lengths = f['GOOD/LEN'][:]
-        count = 0
-        for num, length in enumerate(lengths):
-            data.append(f['GOOD/DATA'][count:count + length])
-            num_good += 1
-            count += length
+    prefix_good = 'data/good/'
+    prefix_bad = 'data/bad/'
 
-        data = random.sample(data, load_num_good)
-        num_good = load_num_good
+    # load all of the bad sample
+    for file in os.listdir(prefix_bad):
+        data.append(load_data(prefix_bad + file))
+        num_bad += 1
 
-        # load bad data
-        lengths = f['BAD/LEN'][:]
-        count = 0
-        for length in lengths:
-            data.append(f['BAD/DATA'][count:count + length])
-            num_bad += 1
-            count += length
+    # load good sample
+    for file in os.listdir(prefix_good):
+        data.append(load_data(prefix_good + file))
+        num_good += 1
+        if num_good == load_num_good - 1:
+            num_good = num_good + 1
+            break
 
     return data, num_good, num_bad
 
 
-def load_data_example(st_index: int, end_index: int):
+def load_data(path):
     """
-    load welding data, left closed right open
-    :param: st_index
-    :param: end_index
-    :return: plain data
+    load the data from file
+    :param path:
+    :return:
     """
-    data = []
-    with h5py.File(definitions.ROOT_DIR + 'dataSets/data.h5') as f:
-        # load good data
-        lengths = f['GOOD/LEN'][:]
-        count = 0
-        for num, length in enumerate(lengths):
-            data.append(f['GOOD/DATA'][count:count + length])
-            count += length
-
-        # load bad data
-        lengths = f['BAD/LEN'][:]
-        count = 0
-        for length in lengths:
-            data.append(f['BAD/DATA'][count:count + length])
-            count += length
-
-    return data[st_index:end_index]
+    with open(path) as f:
+        data = []
+        f_csv = csv.reader(f, delimiter='|')
+        for i, row in enumerate(f_csv):
+            data_temp = [row[1], row[2], row[3]]
+            data.append(data_temp)
+    return np.array(data, dtype=np.float)
 
 
 def regularize(matrix: np.ndarray, axis: int = 0):
