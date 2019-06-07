@@ -46,7 +46,7 @@ If you want to use **tfdbg**, you should,
 
 ## DEMO
 - see the [demo](./demo.ipynb)
-- we implement more model like [DTW](./other/DTW.ipynb) and [MDS](./other/MDS.ipynb) to classify our data.
+- we implement more model like [DTW](./other/DTW.ipynb) and [KNN](./other/KNN.ipynb) to classify our data.
 
 ## MORE
 - CNN model's test accuracy is more than 0.96 and train accuracy is more than 0.99

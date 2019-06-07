@@ -42,7 +42,7 @@
 
 ## 示例
 - 看 [示例](./demo.ipynb)
-- 我们实现了 [DTW](./other/DTW.ipynb) 和 [MDS](./other/MDS.ipynb) 去分类我们的模型.
+- 我们实现了 [DTW](./other/DTW.ipynb) 和 [KNN](./other/KNN.ipynb) 去分类我们的模型.
 
 ## 更多
 - 卷积神经网络模型的训练集精度大于0.99，测试集精度大于0.96
