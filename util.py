@@ -3,7 +3,6 @@ import os
 import math
 import numpy as np
 from imblearn.over_sampling import ADASYN
-import definitions
 
 
 def load_train_data(load_num_good: int = 2000):
@@ -19,16 +18,16 @@ def load_train_data(load_num_good: int = 2000):
     prefix_bad = 'data/bad/'
 
     # load good sample
-    for file in os.listdir(definitions.ROOT_DIR + prefix_good):
-        data.append(load_data(definitions.ROOT_DIR + prefix_good + file))
+    for file in os.listdir(os.path.join(os.getcwd(), prefix_good)):
+        data.append(load_data(os.path.join(os.getcwd(), prefix_good, file)))
         num_good += 1
         if num_good == load_num_good - 1:
             num_good = num_good + 1
             break
 
     # load all of the bad sample
-    for file in os.listdir(definitions.ROOT_DIR + prefix_bad):
-        data.append(load_data(definitions.ROOT_DIR + prefix_bad + file))
+    for file in os.listdir(os.path.join(os.getcwd(), prefix_bad)):
+        data.append(load_data(os.path.join(os.getcwd(), prefix_bad, file)))
         num_bad += 1
 
     return data, num_good, num_bad

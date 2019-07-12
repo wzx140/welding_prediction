@@ -1,3 +1,4 @@
+import os
 from argparse import ArgumentParser
 
 import tensorflow as tf
@@ -6,9 +7,9 @@ from tensorflow.python import debug as tf_debug
 import numpy as np
 from datetime import datetime
 
-from log import log
 import util
-from config import *
+import log
+from resource.config import *
 from cnn import Cnn
 
 
@@ -90,8 +91,8 @@ def train():
 
         # log for tensorboard
         merged = tf.summary.merge_all()
-        train_writer = tf.summary.FileWriter("log/tsb/train/" + TIMESTAMP, sess.graph)
-        test_writer = tf.summary.FileWriter("log/tsb/test/" + TIMESTAMP)
+        train_writer = tf.summary.FileWriter("resource/tsb/train/" + TIMESTAMP, sess.graph)
+        test_writer = tf.summary.FileWriter("resource/tsb/test/" + TIMESTAMP)
 
         if enable_debug:
             sess = tf_debug.LocalCLIDebugWrapperSession(sess)
@@ -138,9 +139,9 @@ def train():
                        'Train accuracy: %f\n' % train_accuracy + \
                        'Test accuracy: %f' % test_accuracy
                 log.log_info(info)
-                saver.save(sess, "log/model/" + TIMESTAMP)
+                saver.save(sess, "resource/model/" + TIMESTAMP)
                 break
-            saver.save(sess, "log/model/" + TIMESTAMP)
+            saver.save(sess, "resource/model/" + TIMESTAMP)
         train_writer.close()
         test_writer.close()
 
@@ -158,7 +159,7 @@ def predict(path: str, data_x: np.ndarray):
         data_x[i, :, 2] = util.regularize(data_x[i, :, 2])
 
     with tf.Session() as sess:
-        saver = tf.train.import_meta_graph(path + '.meta')
+        saver = tf.train.import_meta_graph(os.path.join(path, '.meta'))
         saver.restore(sess, path)
         graph = tf.get_default_graph()
         placehold_x = graph.get_tensor_by_name('input/data_x:0')

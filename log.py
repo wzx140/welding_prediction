@@ -1,9 +1,13 @@
 import logging
-import definitions
+import os
+
+log_path = os.path.join(os.getcwd(), 'resource/log.txt')
+if not os.path.exists(log_path):
+    open(log_path, 'w')
 
 logger = logging.getLogger('tensorflow')
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(definitions.ROOT_DIR + 'log/log.txt', encoding='utf-8')
+fh = logging.FileHandler(log_path, encoding='utf-8')
 fh.setLevel(logging.INFO)
 formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 fh.setFormatter(formatter)
