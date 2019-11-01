@@ -1,4 +1,6 @@
 ## Convolutional Neural Network For Predicting Welding Quality
+> [click to learn more](https://masterwangzx.com/2019/07/03/cnn-in-welding/)
+
 - [Chinese](README_CN.md)
 ### PREREQUISITES
 - numpy

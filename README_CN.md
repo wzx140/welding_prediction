@@ -1,4 +1,6 @@
 ## 基于卷积神经网络的焊接评估系统
+> [点击获取更多](https://masterwangzx.com/2019/07/03/cnn-in-welding/)
+
 ### 必备库
 - numpy
 - tensorflow
